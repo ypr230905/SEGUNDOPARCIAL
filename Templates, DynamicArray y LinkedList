@@ -1,0 +1,162 @@
+// YUNUEN PORTES RAMIREZ
+#ifndef DYNAMIC_ARRAY_H // Evita incluir el archivo dos veces
+#define DYNAMIC_ARRAY_H
+
+#define COUNT_DYNAMIC_ARRAY_COPIES 1 // Activa el contador de copias
+
+#include <iostream>
+using namespace std;
+
+template <typename T>
+class DynamicArray 
+{
+private:
+    T* data; // Arreglo dinámico
+    int count; // Número de elementos
+    int capacity; // Tamaño máximo actual
+#if COUNT_DYNAMIC_ARRAY_COPIES
+    int copyCounter = 0; // Contador de copias
+#endif
+
+    void resize(int newCapacity) { // Cambia el tamaño del arreglo
+        T* newData = new T[newCapacity];
+        for (int i = 0; i < count; i++) 
+        {
+            newData[i] = data[i];
+#if COUNT_DYNAMIC_ARRAY_COPIES
+            copyCounter++; // Cuenta cada copia
+#endif
+        }
+        delete[] data; // Libera memoria vieja
+        data = newData; // Apunta al nuevo arreglo
+        capacity = newCapacity; // Actualiza capacidad
+    }
+
+public:
+    DynamicArray() : data(nullptr), count(0), capacity(0) {}
+
+    ~DynamicArray() 
+    {
+        delete[] data; // Libera memoria usada
+    }
+
+    void Append(const T& value) 
+    {
+        if (count == capacity)
+            resize(capacity == 0 ? 1 : capacity * 2); // Doble de espacio si se llena
+        data[count++] = value;
+    }
+
+    void push_back(const T& value) 
+    {
+        Append(value); // Alias de Append
+    }
+
+    void pop_back() 
+    {
+        if (count > 0) count--; // Elimina el último
+    }
+
+    void shrink_to_fit() 
+    {
+        if (capacity > count)
+            resize(count); // Ajusta la capacidad al número exacto de elementos
+    }
+
+    T& operator[](int index) 
+    { // Acceso tipo array
+        return data[index];
+    }
+
+    int size() const 
+    { // Regresa cuántos elementos hay
+        return count;
+    }
+
+#if COUNT_DYNAMIC_ARRAY_COPIES
+    int getCopyCount() const 
+    { // Muestra cuántas copias se hicieron
+        return copyCounter;
+    }
+#endif
+};
+#endif
+
+// -------- LinkedList.h --------
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
+
+#include <iostream>
+using namespace std;
+
+template <typename T>
+class LinkedList 
+{
+private:
+    struct Node 
+    { // Nodo de la lista
+        T data;
+        Node* next;
+        Node(const T& value) : data(value), next(nullptr) {}
+    };
+
+    Node* head; // Inicio de la lista
+
+public:
+    LinkedList() : head(nullptr) {}
+
+    ~LinkedList() 
+    {
+        while (head) 
+        {// Libera cada nodo
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void push_front(const T& value) 
+    { // Inserta al inicio
+        Node* newNode = new Node(value);
+        newNode->next = head;
+        head = newNode;
+    }
+
+    void pop_front() 
+    { // Quita el primero
+        if (head) 
+        {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void Print() const 
+    { // Imprime los elementos
+        Node* current = head;
+        while (current) {
+            cout << current->data << " ";
+            current = current->next;
+        }
+        cout << endl;
+    }
+};
+#endif
+
+// -------- TemplateFunctions.h --------
+#ifndef TEMPLATE_FUNCTIONS_H
+#define TEMPLATE_FUNCTIONS_H
+
+#include <iostream>
+using namespace std;
+
+template <typename T>
+void PrintArray(T arr[], int size) 
+{ // Imprime un arreglo
+    for (int i = 0; i < size; i++)
+        cout << arr[i] << " ";
+    cout << endl;
+}
+
+#endif
